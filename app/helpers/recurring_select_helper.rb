@@ -6,6 +6,10 @@ module RecurringSelectHelper
       def select_recurring(object, method, default_schedules = nil, options = {}, html_options = {})
         RecurringSelectTag.new(object, method, self, default_schedules, options, html_options).render
       end
+
+      def link_recurring(object, method, default_schedules = nil, options = {}, html_options = {})
+        RecurringSelectTag.new(object, method, self, default_schedules, options, html_options).render_link
+      end
     elsif Rails::VERSION::MAJOR == 3
       def select_recurring(object, method, default_schedules = nil, options = {}, html_options = {})
         InstanceTag.new(object, method, self, options.delete(:object)).to_recurring_select_tag(default_schedules, options, html_options)
@@ -20,6 +24,14 @@ module RecurringSelectHelper
       end
 
       @template.select_recurring(@object_name, method, default_schedules, options.merge(:object => @object), html_options)
+    end
+
+    def link_recurring(method, default_schedules = nil, options = {}, html_options = {})
+      if !@template.respond_to?(:link_recurring)
+        @template.class.send(:include, RecurringSelectHelper::FormHelper)
+      end
+
+      @template.link_recurring(@object_name, method, default_schedules, options.merge(:object => @object), html_options)
     end
   end
 
@@ -94,6 +106,12 @@ module RecurringSelectHelper
       html_options["class"] = (html_options["class"].to_s.split + ["recurring_select"]).join(" ")
       html_options
     end
+
+    def recurring_link_html_options(html_options)
+      html_options = html_options.stringify_keys
+      html_options["class"] = (html_options["class"].to_s.split + ["recurring_link"]).join(" ")
+      html_options
+    end
   end
 
   if Rails::VERSION::STRING.to_f >= 4.0
@@ -120,6 +138,34 @@ module RecurringSelectHelper
           option_tags = add_options(recurring_options_for_select(value(object), @default_schedules, @options), @options, value(object))
         end
         select_content_tag(option_tags, @options, @html_options)
+      end
+
+      def render_link
+        @html_options = recurring_link_html_options(@html_options)
+        default_schedule = @default_schedules.first.to_hash if @default_schedules
+
+        add_default_name_and_id(@html_options)
+        @html_options['id'] += '_link'
+        @html_options.delete 'name'
+
+        value = default_schedule || value(object)
+        link_text = @options.fetch(:link_text, I18n.t("recurring_select.none"))
+        blank_label = @options[:blank_label] || I18n.t("recurring_select.none")
+
+        @html_options.merge! :href => 'javascript:',
+          :data => {
+            :recurring_options => {
+              :blank_label => blank_label,
+              :allow_blank => @options[:allow_blank] || false,
+              :collapsible => @options[:collapsible].nil? ? false : @options[:collapsible],
+              :schedule    => value
+            }
+          }
+
+        add_default_name_and_id(hidden_field_options)
+        [
+          content_tag("a", link_text, @html_options),
+        ].join("").html_safe
       end
     end
 
