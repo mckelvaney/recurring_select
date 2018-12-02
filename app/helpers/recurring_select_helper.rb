@@ -163,7 +163,6 @@ module RecurringSelectHelper
             }
           }
 
-        add_default_name_and_id(hidden_field_options)
         [
           content_tag("a", link_text, @html_options),
         ].join("").html_safe
