@@ -182,12 +182,13 @@ window.RecurringSelectDialog =
       monthly_calendar.html ""
       for num in [1..31]
         monthly_calendar.append (day_link = $(document.createElement("a")).text(num))
+        day_link.addClass("rs_calendar_day rs_calendar_day__day")
         if $.inArray(num, @current_rule.hash.validations.day_of_month) != -1
           day_link.addClass("selected")
 
       # add last day of month button
       monthly_calendar.append (end_of_month_link = $(document.createElement("a")).text($.fn.recurring_select.texts["last_day"]))
-      end_of_month_link.addClass("end_of_month")
+      end_of_month_link.addClass("rs_calendar_day rs_calendar_day__end_of_month end_of_month")
       if $.inArray(-1, @current_rule.hash.validations.day_of_month) != -1
         end_of_month_link.addClass("selected")
 
@@ -202,10 +203,11 @@ window.RecurringSelectDialog =
 
       for num, index in [1, 2, 3, 4, 5, -1]
         if show_row[index]
-          monthly_calendar.append "<span>#{row_labels[num - 1]}</span>"
+          monthly_calendar.append "<span class='rs_calendar_week__week-number'>#{row_labels[num - 1]}</span>"
           for day_of_week in [$.fn.recurring_select.texts["first_day_of_week"]...(7 + $.fn.recurring_select.texts["first_day_of_week"])]
             day_of_week = day_of_week % 7
             day_link = $("<a>", {text: cell_str[day_of_week] })
+            day_link.addClass("rs_calendar_week__day")
             day_link.attr("day", day_of_week)
             day_link.attr("instance", num)
             monthly_calendar.append day_link
@@ -333,7 +335,7 @@ window.RecurringSelectDialog =
       "
       for day_of_week in [$.fn.recurring_select.texts["first_day_of_week"]...(7 + $.fn.recurring_select.texts["first_day_of_week"])]
         day_of_week = day_of_week % 7
-        str += "<a href='#' data-value='#{day_of_week}'>#{$.fn.recurring_select.texts["days_first_letter"][day_of_week]}</a>"
+        str += "<a href='#' class='rs_calendar_day' data-value='#{day_of_week}'>#{$.fn.recurring_select.texts["days_first_letter"][day_of_week]}</a>"
 
       str += "
               </div>
@@ -345,12 +347,12 @@ window.RecurringSelectDialog =
                 <input type='text' data-wrapper-class='ui-recurring-select' name='rs_monthly_interval' class='rs_monthly_interval rs_interval' value='1' size='2' />
                 #{$.fn.recurring_select.texts["months"]}:
               </p>
-              <p class='monthly_rule_type'>
-                <span><label for='monthly_rule_type_day'>#{$.fn.recurring_select.texts["day_of_month"]}</label><input type='radio' class='monthly_rule_type_day' name='monthly_rule_type' id='monthly_rule_type_day' value='true' /></span>
-                <span><label for='monthly_rule_type_week'>#{$.fn.recurring_select.texts["day_of_week"]}</label><input type='radio' class='monthly_rule_type_week' name='monthly_rule_type' id='monthly_rule_type_week' value='true' /></span>
-              </p>
-              <p class='rs_calendar_day'></p>
-              <p class='rs_calendar_week'></p>
+              <div class='monthly_rule_type'>
+                <label for='monthly_rule_type_day' class='btn btn-primary mr-3'>#{$.fn.recurring_select.texts["day_of_month"]}<input type='radio' class='monthly_rule_type_day sr-only' name='monthly_rule_type' id='monthly_rule_type_day' value='true' /></label>
+                <label for='monthly_rule_type_week' class='btn btn-primary'>#{$.fn.recurring_select.texts["day_of_week"]}<input type='radio' class='monthly_rule_type_week sr-only' name='monthly_rule_type' id='monthly_rule_type_week' value='true' /></label>
+              </div>
+              <div class='rs_calendar_day'></div>
+              <div class='rs_calendar_week'></div>
             </div>
             <div class='yearly_options freq_option_section'>
               <p>
@@ -363,8 +365,8 @@ window.RecurringSelectDialog =
               <span></span>
             </p>
             <div class='controls'>
-              <input type='button' data-wrapper-class='ui-recurring-select' class='rs_save' value='#{$.fn.recurring_select.texts["ok"]}' />
-              <input type='button' data-wrapper-class='ui-recurring-select' class='rs_cancel' value='#{$.fn.recurring_select.texts["cancel"]}' />
+              <input type='button' data-wrapper-class='ui-recurring-select' class='rs_save btn btn-primary' value='#{$.fn.recurring_select.texts["ok"]}' />
+              <input type='button' data-wrapper-class='ui-recurring-select' class='rs_cancel btn btn-danger' value='#{$.fn.recurring_select.texts["cancel"]}' />
             </div>
           </div>
         </div>
