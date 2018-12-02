@@ -6,7 +6,7 @@ window.RecurringSelectDialog =
       if not @current_rule.hash? or not @current_rule.hash.rule_type?
         @freqChanged()
       else
-        setTimeout @positionDialogVert, 10 # allow initial render
+        # setTimeout @positionDialogVert, 10 # allow initial render
 
     initDialogBox: ->
       $(".rs_dialog_holder").remove()
@@ -17,7 +17,7 @@ window.RecurringSelectDialog =
       @outer_holder = $(".rs_dialog_holder")
       @inner_holder = @outer_holder.find ".rs_dialog"
       @content = @outer_holder.find ".rs_dialog_content"
-      @positionDialogVert(true)
+      # @positionDialogVert(true)
       @mainEventInit()
       @freqInit()
       @summaryInit()
@@ -250,7 +250,7 @@ window.RecurringSelectDialog =
           @current_rule.str = $.fn.recurring_select.texts["daily"]
           @initDailyOptions()
       @summaryUpdate()
-      @positionDialogVert()
+      # @positionDialogVert()
 
     intervalChanged: (event) =>
       @current_rule.str = null
