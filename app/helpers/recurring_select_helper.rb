@@ -125,13 +125,14 @@ module RecurringSelectHelper
         @choices = @choices.to_a if @choices.is_a?(Range)
         @method_name = method.to_s
         @object_name = object.to_s
-        @html_options = recurring_select_html_options(html_options)
+        @html_options = html_options
         add_default_name_and_id(@html_options)
 
         super(object, method, template_object, options)
       end
 
       def render
+        @html_options = recurring_select_html_options(@html_options)
         if Rails::VERSION::STRING >= '5.2'
           option_tags = add_options(recurring_options_for_select(value, @default_schedules, @options), @options, value)
         else
