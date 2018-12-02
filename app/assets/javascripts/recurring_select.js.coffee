@@ -9,6 +9,10 @@ $ ->
   $(document).on "change", ".recurring_select", ->
     $(this).recurring_select('changed')
 
+  $(document).on "click", ".recurring_link", ->
+    $(this).recurring_select('set_initial_values')
+    $(this).recurring_select('changed')
+
 methods =
   set_initial_values: ->
     @data 'initial-value-hash', @val()
@@ -67,7 +71,67 @@ methods =
   methods: ->
     methods
 
+link_methods =
+  set_initial_values: ->
+    value = JSON.stringify(this.data("recurringOptions").schedule)
+
+    @data 'initial-value-hash', value || "\"{ rule_type : 'None' }\""
+    @data 'initial-value-str', @text()
+
+  changed: ->
+    $('.recurring_link').not(this).removeClass('active')
+    this.addClass "active"
+    @data "recurring-link-active", true
+    new RecurringSelectDialog(@, @data('recurring-options'))
+    @blur()
+
+  open_custom: ->
+    @data "recurring-select-active", true
+    new RecurringSelectDialog(@)
+    @blur()
+
+  save: (new_rule) ->
+    @find("option[data-custom]").remove()
+    new_json_val = JSON.stringify(new_rule.hash)
+
+    this.data("recurringOptions").schedule = new_rule.hash
+    $('input[name="event[recurring]"]').val(new_json_val)
+
+    methods.set_initial_values.apply @
+    @.trigger "recurring_select:save"
+
+  current_rule: ->
+    str:  @data("initial-value-str")
+    hash: $.parseJSON(@data("initial-value-hash"))
+
+  cancel: ->
+    @val @data("initial-value-hash")
+    @data "recurring-select-active", false
+    @.trigger "recurring_select:cancel"
+
+
+  insert_option: (new_rule_str, new_rule_json) ->
+    separator = @find("option:disabled")
+    if separator.length == 0
+      separator = @find("option")
+    separator = separator.last()
+
+    new_option = $(document.createElement("option"))
+    new_option.attr "data-custom", true
+
+    if new_rule_str.substr(new_rule_str.length - 1) != "*"
+      new_rule_str+="*"
+
+    new_option.text new_rule_str
+    new_option.val new_rule_json
+    new_option.insertBefore separator
+
+  methods: ->
+    link_methods
+
 $.fn.recurring_select = (method) ->
+  methods = if this[0].nodeName =='SELECT' then methods else link_methods
+
   if method of methods
     return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ) );
   else
