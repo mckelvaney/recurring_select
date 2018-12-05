@@ -149,7 +149,8 @@ module RecurringSelectHelper
         @html_options['id'] += '_link'
         @html_options.delete 'name'
 
-        value = value(object) || default_schedule
+        Rails.logger.debug(value(object)[:rule_type])
+        value = value(object)[:rule_type] == default_schedule[:rule_type] ? value(object) : default_schedule
         link_text = @options.fetch(:link_text, I18n.t("recurring_select.none"))
         blank_label = @options[:blank_label] || I18n.t("recurring_select.none")
 
