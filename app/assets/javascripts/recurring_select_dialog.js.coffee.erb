@@ -50,6 +50,7 @@ window.RecurringSelectDialog =
           @inner_holder.trigger "recurring_select:dialog_positioned"
 
     cancel: =>
+      @summaryEmpty()
       @outer_holder.remove()
       @recurring_selector.recurring_select('cancel')
 
@@ -144,9 +145,12 @@ window.RecurringSelectDialog =
 
     summaryInit: ->
       @summary = $(".rs_summary")
-      @summaryUpdate()
+      # @summaryUpdate()
 
 # ========================= render methods ===============================
+
+    summaryEmpty: ->
+      @summary.find("span").html ''
 
     summaryUpdate: (new_string) =>
       @summary.width @content.width()
